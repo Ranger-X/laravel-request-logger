@@ -14,7 +14,7 @@ Insiperd by [Morgan - Node HTTP request logger](https://github.com/expressjs/mor
 Add `prettus/laravel-request-logger` to the "require" section of your `composer.json` file.
 
 ```json
-	"prettus/laravel-request-logger": "1.0.*"
+	"prettus/laravel-request-logger": "1.0.2"
 ```
 
 Run `composer update` to get the latest version of the package.
@@ -30,7 +30,7 @@ In your `config/app.php` add `'Prettus\RequestLogger\Providers\LoggerServiceProv
 ```php
 'providers' => array(
     ...,
-    'Prettus\RequestLogger\Providers\LoggerServiceProvider',
+    Prettus\RequestLogger\Providers\LoggerServiceProvider::class,
 ),
 ```
 
@@ -93,6 +93,8 @@ In your `config/request-logger.php` file, you can change configuration for logge
 | {server[*KEY*]}   | $_SERVER Server and execution environment information (See more)[http://php.net/manual/reserved.variables.server.php]          |              |
 | {req[*HEADER*]}   | Request Header values |              |
 | {res[*HEADER*]}   | Response Header values |              |
+| {input[*KEY*]}   | Value of query parameter with name=*KEY* |              |
+| {req-all}   | Query string as JSON |              |
 
 
 

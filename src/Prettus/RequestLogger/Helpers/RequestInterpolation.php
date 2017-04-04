@@ -19,7 +19,7 @@ class RequestInterpolation extends BaseInterpolation {
 
         foreach( $variables as $variable ) {
             $matches = [];
-            preg_match("/{\s*(.+?)\s*}(\r?\n)?/", $variable, $matches);
+            preg_match("/{\\s*(.+?)\\s*}(\\r?\\n)?/", $variable, $matches);
             if( isset($matches[1]) ) {
                 $value = $this->escape($this->resolveVariable($matches[0], $matches[1]));
                 $text = str_replace($matches[0], $value, $text);
@@ -78,7 +78,7 @@ class RequestInterpolation extends BaseInterpolation {
             return $this->request->server($server_var);
         } else {
             $matches = [];
-            preg_match("/([-\w]{2,})(?:\[([^\]]+)\])?/", $variable, $matches);
+            preg_match("/([-\\w]{2,})(?:\\[([^\\]]+)\\])?/", $variable, $matches);
 
             if( count($matches) == 2 ) {
                 switch($matches[0]) {
@@ -107,6 +107,10 @@ class RequestInterpolation extends BaseInterpolation {
                         return $this->request->header(strtolower($option));
                     case "server":
                         return $this->request->server($option);
+                    case "input":
+                        return $this->request->input($option);
+                    case "req-all":
+                        return json_encode($this->request->all(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                     default;
                         return $raw;
                 }

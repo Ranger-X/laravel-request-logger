@@ -16,7 +16,7 @@ class ResponseInterpolation extends BaseInterpolation {
 
         foreach( $variables as $variable ) {
             $matches = [];
-            preg_match("/{\s*(.+?)\s*}(\r?\n)?/", $variable, $matches);
+            preg_match("/{\\s*(.+?)\\s*}(\\r?\\n)?/", $variable, $matches);
             if( isset($matches[1]) ) {
                 $value =  $this->escape($this->resolveVariable($matches[0], $matches[1]));
                 $text = str_replace($matches[0], $value, $text);
@@ -51,7 +51,7 @@ class ResponseInterpolation extends BaseInterpolation {
             return $this->$method();
         } else {
             $matches = [];
-            preg_match("/([-\w]{2,})(?:\[([^\]]+)\])?/", $variable, $matches);
+            preg_match("/([-\\w]{2,})(?:\\[([^\\]]+)\\])?/", $variable, $matches);
 
             if( count($matches) == 3 ) {
                 list($line, $var, $option) = $matches;
