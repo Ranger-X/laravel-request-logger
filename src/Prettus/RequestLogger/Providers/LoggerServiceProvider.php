@@ -34,12 +34,12 @@ class LoggerServiceProvider extends ServiceProvider
      * @return void
      */
     public function register()
-    {        
-        app('router')->before(function(){
+    {
+        app('events')->listen('router.before', function() {
             Benchmarking::start('application');
         });
 
-        app('router')->after(function(){
+        app('events')->listen('router.after', function() {
             Benchmarking::end('application');
         });
 
