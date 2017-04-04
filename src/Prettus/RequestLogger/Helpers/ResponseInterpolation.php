@@ -73,20 +73,11 @@ class ResponseInterpolation extends BaseInterpolation {
      */
     public function getContentLength()
     {
-
-        $path = storage_path("framework".DIRECTORY_SEPARATOR."temp");
-
-        if( !file_exists($path)){
-            mkdir($path, 0777, true);
-        }
-
         $content = $this->response->getContent();
-        $file    = $path.DIRECTORY_SEPARATOR."response-".time();
-        file_put_contents($file, $content);
-        $content_length = filesize($file);
-        unlink($file);
 
-        return $content_length;
+        // utf8_decode() converts characters that are not in ISO-8859-1 to '?', which,
+        // for the purpose of counting, is quite alright
+        return strlen(utf8_decode($content));
     }
 
     /**
