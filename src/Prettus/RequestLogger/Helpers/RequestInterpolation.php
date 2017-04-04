@@ -85,6 +85,10 @@ class RequestInterpolation extends BaseInterpolation {
                 case "date":
                     $matches[] = "clf";
                     break;
+
+                case "req-all":
+                    $matches[] = 'dummy';
+                    break;
                 }
             }
 
