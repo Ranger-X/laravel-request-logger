@@ -60,6 +60,7 @@ class ResponseLogger
     {
         $this->responseInterpolation->setResponse($response);
         $this->responseInterpolation->setRequest($request);
+
         $this->requestInterpolation->setRequest($request);
 
         if( config('request-logger.logger.enabled') ) {

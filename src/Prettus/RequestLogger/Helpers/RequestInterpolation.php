@@ -21,7 +21,15 @@ class RequestInterpolation extends BaseInterpolation {
             $matches = [];
             preg_match("/{\\s*(.+?)\\s*}(\\r?\\n)?/", $variable, $matches);
             if( isset($matches[1]) ) {
-                $value = $this->escape($this->resolveVariable($matches[0], $matches[1]));
+                $value = $this->resolveVariable($matches[0], $matches[1]);
+
+                $flags = $value['flags'];
+                $value = $value['value'];
+
+                if (!in_array('ne', $flags))
+                    // escape value
+                    $value = $this->escape($value);
+
                 $text = str_replace($matches[0], $value, $text);
             }
         }
@@ -32,17 +40,20 @@ class RequestInterpolation extends BaseInterpolation {
     /**
      * @param $raw
      * @param $variable
-     * @return string
+     * @return array
      */
     public function resolveVariable($raw, $variable)
     {
+        $flags = explode(':', $variable);
+        // return variable name without flags
+        $variable = array_shift($flags);
+
         $method = str_replace([
             "remoteAddr",
             "scheme",
             "port",
             "queryString",
             "remoteUser",
-            "referrer",
             'body'
         ], [
             "ip",
@@ -50,7 +61,6 @@ class RequestInterpolation extends BaseInterpolation {
             "getPort",
             "getQueryString",
             "getUser",
-            "referer",
             "getContent"
         ],camel_case($variable));
 
@@ -73,9 +83,9 @@ class RequestInterpolation extends BaseInterpolation {
         ], strtoupper(str_replace("-","_", $variable)) );
 
         if( method_exists($this->request, $method) ) {
-            return $this->request->$method();
+            return ['value' => $this->request->$method(), 'flags' => $flags];
         } elseif( isset($_SERVER[$server_var]) ) {
-            return $this->request->server($server_var);
+            return ['value' => $this->request->server($server_var), 'flags' => $flags];
         } else {
             $matches = [];
             preg_match("/([-\\w]{2,})(?:\\[([^\\]]+)\\])?/", $variable, $matches);
@@ -84,6 +94,15 @@ class RequestInterpolation extends BaseInterpolation {
                 switch($matches[0]) {
                 case "date":
                     $matches[] = "clf";
+                    break;
+
+                case "referer":
+                    $matches[1] = 'header';
+                    $matches[] = 'referer';
+                    break;
+
+                case "req-all":
+                    $matches[] = 'dummy';
                     break;
                 }
             }
@@ -100,23 +119,24 @@ class RequestInterpolation extends BaseInterpolation {
                             "web"=>Carbon::now()->toRfc1123String()
                         ];
 
-                        return isset($formats[$option]) ? $formats[$option] : Carbon::now()->format($option);
+                        return ['value' => isset($formats[$option]) ? $formats[$option] :
+                            Carbon::now()->format($option), 'flags' => $flags];
 
                     case "req":
                     case "header":
-                        return $this->request->header(strtolower($option));
+                        return ['value' => $this->request->header(strtolower($option)), 'flags' => $flags];
                     case "server":
-                        return $this->request->server($option);
+                        return ['value' => $this->request->server($option), 'flags' => $flags];
                     case "input":
-                        return $this->request->input($option);
+                        return ['value' => $this->request->input($option), 'flags' => $flags];
                     case "req-all":
-                        return json_encode($this->request->all(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                        return ['value' => json_encode($this->request->all(), JSON_UNESCAPED_UNICODE), 'flags' => $flags];
                     default;
-                        return $raw;
+                        return ['value' => $raw, 'flags' => $flags];
                 }
             }
         }
-        
-        return $raw;
+
+        return ['value' => $raw, 'flags' => $flags];
     }
 }

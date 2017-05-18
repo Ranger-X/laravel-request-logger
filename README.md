@@ -68,7 +68,7 @@ In your `config/request-logger.php` file, you can change configuration for logge
 
 #### Variables
 
-| Format         | Description                                                           | Exemple                                 |
+| Format         | Description                                                           | Example                                 |
 |----------------|-----------------------------------------------------------------------|-----------------------------------------|
 | {method}       | Get the request method.                                               | PUT                                     |
 | {root}         | Get the root URL for the application.                                 | http://prettus.local                    |
@@ -96,6 +96,13 @@ In your `config/request-logger.php` file, you can change configuration for logge
 | {input[*KEY*]}   | Value of query parameter with name=*KEY* |              |
 | {req-all}   | Query string as JSON |              |
 
+#### Value modifiers
+
+Each format variable can be suffixed with an one or more modifiers, separated by colon (:). Like: `{user-agent:ne}`. 
+
+| Modifier       | Description                                                           | Example                                 |
+|----------------|-----------------------------------------------------------------------|-----------------------------------------|
+| ne             | Do not escape value (do not replace spaces with \s)                   | {input[test]:ne}                                     |
 
 
 #### Default formats
