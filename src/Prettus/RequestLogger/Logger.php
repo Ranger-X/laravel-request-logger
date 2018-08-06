@@ -40,6 +40,18 @@ class Logger implements Log
     }
 
     /**
+     * Log an emergency message to the logs.
+     *
+     * @param  string $message
+     * @param  array $context
+     * @return void
+     */
+    public function emergency($message, array $context = array())
+    {
+        $this->monolog->emergency($message, $context);
+    }
+
+    /**
      * Log an alert message to the logs.
      *
      * @param  string $message
