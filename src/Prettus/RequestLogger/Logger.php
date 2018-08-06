@@ -2,7 +2,7 @@
 
 namespace Prettus\RequestLogger;
 
-use Illuminate\Contracts\Logging\Log;
+use Psr\Log\LoggerInterface as Log;
 
 /**
  * Class Logger
