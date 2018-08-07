@@ -4,6 +4,7 @@ namespace Prettus\RequestLogger\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Prettus\RequestLogger\Helpers\Benchmarking;
+use Prettus\RequestLogger\HttpRequestsLogChannel;
 
 /**
  * Class LoggerServiceProvider
@@ -42,6 +43,16 @@ class LoggerServiceProvider extends ServiceProvider
         app('events')->listen('router.after', function() {
             Benchmarking::end('application');
         });
+
+        $app = $this->app;
+
+        // Add a requests log channel for Laravel 5.6+
+        if (version_compare($app::VERSION, '5.6') >= 0) {
+            $this->app->make('log')->extend('http_requests', function ($app, array $config) {
+                $channel = new HttpRequestsLogChannel($app);
+                return $channel($config);
+            });
+        }
 
         $kernel = $this->app->make('Illuminate\Contracts\Http\Kernel');
         $kernel->prependMiddleware(\Prettus\RequestLogger\Middlewares\ResponseLoggerMiddleware::class);
