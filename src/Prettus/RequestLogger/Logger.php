@@ -3,6 +3,7 @@
 namespace Prettus\RequestLogger;
 
 use Psr\Log\LoggerInterface as Log;
+use Illuminate\Log\Logger as LaravelLogger;
 use Monolog\Logger as MonologLogger;
 
 /**
@@ -17,15 +18,9 @@ class Logger implements Log
      */
     protected $monolog;
 
-    /**
-     * Create a new log instance.
-     *
-     * @param  \Monolog\Logger  $monolog
-     * @return void
-     */
-    public function __construct(MonologLogger $monolog)
+    public function __construct()
     {
-        $this->monolog = $monolog;
+        $this->monolog = LaravelLogger::getLogger();
 
         if( config('request-logger.logger.enabled') && $handlers = config('request-logger.logger.handlers') ) {
             if( count($handlers) ) {
