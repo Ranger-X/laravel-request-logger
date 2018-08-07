@@ -3,6 +3,7 @@
 namespace Prettus\RequestLogger;
 
 use Psr\Log\LoggerInterface as Log;
+use Monolog\Logger as MonologLogger;
 
 /**
  * Class Logger
@@ -17,11 +18,14 @@ class Logger implements Log
     protected $monolog;
 
     /**
+     * Create a new log instance.
      *
+     * @param  \Monolog\Logger  $monolog
+     * @return void
      */
-    public function __construct()
+    public function __construct(MonologLogger $monolog)
     {
-        $this->monolog = clone app('log')->getMonolog();
+        $this->monolog = $monolog;
 
         if( config('request-logger.logger.enabled') && $handlers = config('request-logger.logger.handlers') ) {
             if( count($handlers) ) {
