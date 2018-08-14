@@ -30,7 +30,7 @@ class ResponseLoggerMiddleware
         if(!$this->excluded($request)) {                    
             $task = new LogTask($request, $response);
 
-            if($queueName = config('request-logger.queue')) {
+            if($queueName = config('logging.channels.requests_log.queue')) {
                 $this->dispatch(is_string($queueName) ? $task->onQueue($queueName) : $task);
             } else {
                 $task->handle();
@@ -39,7 +39,7 @@ class ResponseLoggerMiddleware
     }
 
     protected function excluded(Request $request) {
-        $exclude = config('request-logger.exclude');
+        $exclude = config('logging.channels.requests_log.exclude');
 		
 		if (null === $exclude || empty($exclude)) {
 			return false;

@@ -52,16 +52,19 @@ class ResponseLogger
      */
     public function log(Request $request, Response $response)
     {
+        //throw new \LogicException(print_r($request, true));
+
         $this->responseInterpolation->setResponse($response);
         $this->responseInterpolation->setRequest($request);
 
         $this->requestInterpolation->setRequest($request);
 
-        $format = config('request-logger.logger.format', "{ip} {remote_user} {date} {method} {url} HTTP/{http_version} {status} {content_length} {referer} {user_agent}");
+        $format = config('logging.channels.requests_log.format', "{ip} {remote_user} {date} {method} {url} HTTP/{http_version} {status} {content_length} {referer} {user_agent}");
         $format = array_get($this->formats, $format, $format);
         $message = $this->responseInterpolation->interpolate($format);
         $message = $this->requestInterpolation->interpolate($message);
-        Log::log( config('request-logger.logger.level', 'info') , $message, [
+
+        Log::channel('requests_log')->log(config('logging.channels.requests_log.level', 'info') , $message, [
             static::LOG_CONTEXT
         ]);
     }

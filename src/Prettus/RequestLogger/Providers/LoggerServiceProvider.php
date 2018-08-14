@@ -28,20 +28,19 @@ class LoggerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //app('events')->listen('router.before', function() {
-        //    Benchmarking::start('application');
-        //});
-        //
-        //app('events')->listen('router.after', function() {
-        //    Benchmarking::end('application');
-        //});
+        app('events')->listen('router.before', function() {
+            Benchmarking::start('application');
+        });
+
+        app('events')->listen('router.after', function() {
+            Benchmarking::end('application');
+        });
 
         $app = $this->app;
 
         // Add a requests log channel for Laravel 5.6+
         if (version_compare($app::VERSION, '5.6') >= 0) {
-
-            $this->app->make('log')->extend('http_requests', function ($app, array $config) {
+            $app->make('log')->extend('requests_log', function ($app, array $config) {
                 $channel = new HttpRequestsLogChannel($app);
                 return $channel($config);
             });
@@ -49,7 +48,7 @@ class LoggerServiceProvider extends ServiceProvider
             throw new \LogicException("You should use Laravel >= 5.6 for this module to work");
         }
 
-        $kernel = $this->app->make('Illuminate\Contracts\Http\Kernel');
+        $kernel = $app->make('Illuminate\Contracts\Http\Kernel');
         $kernel->prependMiddleware(\Prettus\RequestLogger\Middlewares\ResponseLoggerMiddleware::class);
     }
 
