@@ -3,7 +3,6 @@
 namespace Prettus\RequestLogger\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Prettus\RequestLogger\Helpers\Benchmarking;
 use Prettus\RequestLogger\HttpRequestsLogChannel;
 
 /**
@@ -20,13 +19,6 @@ class LoggerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([
-            __DIR__ . '/../../../resources/config/request-logger.php' => config_path('request-logger.php')
-        ]);
-
-        $this->mergeConfigFrom(
-            __DIR__ . '/../../../resources/config/request-logger.php', 'request-logger'
-        );
     }
 
     /**
@@ -36,22 +28,25 @@ class LoggerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        app('events')->listen('router.before', function() {
-            Benchmarking::start('application');
-        });
-
-        app('events')->listen('router.after', function() {
-            Benchmarking::end('application');
-        });
+        //app('events')->listen('router.before', function() {
+        //    Benchmarking::start('application');
+        //});
+        //
+        //app('events')->listen('router.after', function() {
+        //    Benchmarking::end('application');
+        //});
 
         $app = $this->app;
 
         // Add a requests log channel for Laravel 5.6+
         if (version_compare($app::VERSION, '5.6') >= 0) {
+
             $this->app->make('log')->extend('http_requests', function ($app, array $config) {
                 $channel = new HttpRequestsLogChannel($app);
                 return $channel($config);
             });
+        } else {
+            throw new \LogicException("You should use Laravel >= 5.6 for this module to work");
         }
 
         $kernel = $this->app->make('Illuminate\Contracts\Http\Kernel');

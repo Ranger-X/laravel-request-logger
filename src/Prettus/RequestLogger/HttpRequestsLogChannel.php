@@ -4,36 +4,27 @@ namespace Prettus\RequestLogger;
 
 use Exception;
 use Illuminate\Log\LogManager;
-use Monolog\Handler\RavenHandler;
-use Monolog\Logger;
+use Monolog\Logger as Monolog;
+use Prettus\RequestLogger\Handler\HttpLoggerHandler;
 
 class HttpRequestsLogChannel extends LogManager
 {
     /**
      * @param array $config
      *
-     * @return Logger
+     * @return Monolog
      */
     public function __invoke(array $config)
     {
-        $channel = $this->parseChannel($config); //$config['name'] ?? env('APP_ENV');
-        $monolog = new Logger($channel);
-
-        if( config('request-logger.logger.enabled') && $handlers = config('request-logger.logger.handlers') ) {
-            if( count($handlers) ) {
-                //Remove default laravel handler
-                $monolog->popHandler();
-
-                foreach($handlers as $handler) {
-                    if( class_exists($handler) ) {
-                        $monolog->pushHandler(app($handler));
-                    } else {
-                        throw new Exception("Handler class [{$handler}] does not exist");
-                    }
-                }
-            }
-        }
-
-        return $monolog;
+        return new Monolog($this->parseChannel($config), [
+            $this->prepareHandler(new HttpLoggerHandler(
+                $config['path'],
+                $config['days'] ?? 0,
+                $this->level($config),
+                $config['bubble'] ?? true,
+                $config['permission'] ?? null,
+                $config['locking'] ?? false
+            )),
+        ]);
     }
 }
