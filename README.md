@@ -42,23 +42,28 @@ php artisan vendor:publish --provider="Prettus\RequestLogger\Providers\LoggerSer
 
 ## Configuration
 
-In your `config/request-logger.php` file, you can change configuration for logger
+In your `config/logging.php` file, you can change configuration for logger
 
 ```php
- 'logger' => [
-    'enabled'   => true,
-    'handlers'  => ['Prettus\RequestLogger\Handler\HttpLoggerHandler'],
-    'file'      => storage_path("logs/http.log"),
-    'level'     => 'info',
-    'format'    => 'common'
-]
+    'channels' => [
+        'stack' => [
+            'driver' => 'stack',
+            'channels' => ['daily'],
+        ],
+
+        'requests_log' => [
+            'driver'    => 'requests_log',
+            'path'      => storage_path("logs/http.log"),
+            'level'     => 'info',
+            'format'    => 'common'
+        ],
 ```
+
+Channel (and driver) **MUST** be named as 'requests_log'.
 
 | Property | Type       | Default Value                                         | Description |
 |----------|------------|-------------------------------------------------------|-------------|
-| enabled  | boolean    | true                                                  | Enable or disable log http |
-| handlers | array      | ['Prettus\RequestLogger\Handler\HttpLoggerHandler']   | Instance of the `Monolog\Handler\HandlerInterface`. (See more)[https://github.com/Seldaek/monolog#handlers] |
-| file     | string     | storage_path("logs/http.log")                         | If you are using `Prettus\RequestLogger\Handler\HttpLoggerHandler`, you can set the file will be saved walk logs |
+| path     | string     | storage_path("logs/http.log")                         | Path to log file |
 | level    | string     | info                                                  | Level logger write: [notice, info, debug, emergency, alert, critical, error, warning] |
 | format   | string     | common                                                | Format for the log record |
 
