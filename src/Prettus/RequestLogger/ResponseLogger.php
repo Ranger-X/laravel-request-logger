@@ -3,6 +3,7 @@
 namespace Prettus\RequestLogger;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 use Prettus\RequestLogger\Helpers\RequestInterpolation;
 use Prettus\RequestLogger\Helpers\ResponseInterpolation;
@@ -60,7 +61,7 @@ class ResponseLogger
         $this->requestInterpolation->setRequest($request);
 
         $format = config('logging.channels.requests_log.format', "{ip} {remote_user} {date} {method} {url} HTTP/{http_version} {status} {content_length} {referer} {user_agent}");
-        $format = array_get($this->formats, $format, $format);
+        $format = Arr::get($this->formats, $format, $format);
         $message = $this->responseInterpolation->interpolate($format);
         $message = $this->requestInterpolation->interpolate($message);
 
